@@ -32,7 +32,7 @@ data-source-line="7" data-source-line-display="true">
   <span class="xsj_heading_content">使用说明</span>
 </h2>
 <p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="8" data-source-line-display="true">填上账号密码,配置好数据库应该就可以用了吧...</p>
-<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="10" data-source-line-display="true">爬取P站收藏夹中的图片以及图片信息存储到mongodb供色图机器人调用
+<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="10" data-source-line-display="true">爬取P站收藏夹中的图片信息存储到mongodb供色图机器人调用
   <br> 还有一个下载脚本和一个半成品的api.....
   <br> 有问题可以提issue
 </p>
