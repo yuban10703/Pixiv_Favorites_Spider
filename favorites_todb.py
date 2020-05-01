@@ -4,13 +4,14 @@ import hashlib
 import pymongo
 import time
 import json
+import random
 from datetime import datetime
 
 username = '' #账号
 password = '' #密码
-myclient = pymongo.MongoClient("mongodb://10.1.1.116:27017/") #数据库地址
-mydb = myclient["setu_test"] #数据库
-mycol = mydb["test2"] #集合
+myclient = pymongo.MongoClient("mongodb://10.1.1.142:27017/") #数据库地址
+mydb = myclient["setu"] #数据库
+mycol = mydb["setu_1"] #集合
 
 hash_secret = '28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c'
 client_id = 'MOBrBDS8blbauoSck0ZfDbtuzpyT'
@@ -190,7 +191,7 @@ while True:
         print('>>OK<<')
         break
     a = next_url(a['next_url'])  # 翻页
-    time.sleep(5)  # 休眠5s,不然会boom....
+    time.sleep(random.randint(3,7))  # 休眠5s,不然会boom....
     for i in a['illusts']:  # 继续轮询
         y = database(Parsing(i))  # 将处理过的数据写入数据库
 
