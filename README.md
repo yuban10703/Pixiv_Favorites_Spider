@@ -31,8 +31,12 @@ data-source-line="7" data-source-line-display="true">
   </div>
   <span class="xsj_heading_content">使用说明</span>
 </h2>
-<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="8" data-source-line-display="true">填上账号密码,配置好数据库应该就可以用了吧...</p>
-<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="10" data-source-line-display="true">爬取P站收藏夹中的图片信息存储到mongodb供色图机器人调用
-  <br> 还有一个下载脚本和一个半成品的api.....
+<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="8" data-source-line-display="true">把库装好
+  <br> 填上账号密码,配置好数据库应该就可以爬色图了...
+  <br> 然后用下载脚本下载色图(下载和存数据库都会自动去重的)
+  <br> 然后iotbot调用数据库里的信息,再去对应路径找图片,再转换成base64上传发送....
+</p>
+<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="13" data-source-line-display="true">爬取P站收藏夹中的图片信息存储到mongodb供色图机器人调用</p>
+<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="15" data-source-line-display="true">还有一个下载脚本和一个半成品的api.....
   <br> 有问题可以提issue
 </p>
