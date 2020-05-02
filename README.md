@@ -18,11 +18,11 @@ data-source-line-display="true">
   </div>
   <span class="xsj_heading_content">安装</span>
 </h2>
-<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="4" data-source-line-display="true">python3.7+环境
-  <br> 库自己看吧...都是些常用的...
+<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="3" data-source-line-display="true">python3.7+环境
+  <br> mongodb
 </p>
 <h2 class="xsj_heading_hash xsj_heading xsj_heading_h2" id="e4bdbfe794a8e8afb4e6988e_3"
-data-source-line="7" data-source-line-display="true">
+data-source-line="6" data-source-line-display="true">
   <div class="xiaoshujiang_element xsj_anchor">
     <a name="e4bdbfe794a8e8afb4e6988e_3" class="blank_anchor_name"></a>
     <a id="e4bdbfe794a8e8afb4e6988e_3" class="blank_anchor_id"></a>
@@ -31,12 +31,11 @@ data-source-line="7" data-source-line-display="true">
   </div>
   <span class="xsj_heading_content">使用说明</span>
 </h2>
-<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="8" data-source-line-display="true">把库装好
-  <br> 填上账号密码,配置好数据库应该就可以爬色图了...
+<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="7" data-source-line-display="true">把库装好
+  <br> 填上账号密码,配置好数据库应该就可以爬自己收藏夹里的色图了.....
   <br> 然后用下载脚本下载色图(下载和存数据库都会自动去重的)
-  <br> 然后iotbot调用数据库里的信息,再去对应路径找图片,再转换成base64上传发送....
+  <br> 默认不是下载原图,下载的是"large"里的链接
+  <br> 由于下载的图片都是webp格式的,PC端的QQ不能显示,所以用转换脚本再转换一下
 </p>
-<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="13" data-source-line-display="true">爬取P站收藏夹中的图片信息存储到mongodb供色图机器人调用</p>
-<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="15" data-source-line-display="true">还有一个下载脚本和一个半成品的api.....
-  <br> 有问题可以提issue
-</p>
+<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="13" data-source-line-display="true">然后iotbot通过api调用数据库里的信息,再去对应路径找图片,再转换成base64上传发送....</p>
+<p class="xsj_paragraph xsj_paragraph_level_0" data-source-line="16" data-source-line-display="true">有问题可以提issue</p>
