@@ -63,7 +63,7 @@ def p_hash():
     return local_time, Hash
 
 
-def token(username, password):
+def token(username, password): #登录
     url = 'https://oauth.secure.pixiv.net/auth/token'
     data = {'client_id': client_id,
             'client_secret': client_secret,
@@ -89,7 +89,7 @@ def token(username, password):
     return res
 
 
-def refresh_token():
+def refresh_token(): #刷新token
     url = 'https://oauth.secure.pixiv.net/auth/token'
     data = {'client_id': client_id,
             'client_secret': client_secret,
@@ -114,7 +114,7 @@ def refresh_token():
     return res
 
 
-def favorites(userid):
+def favorites(userid): #读取收藏夹
     url = 'https://app-api.pixiv.net/v1/user/bookmarks/illust'
     params = {'user_id': userid,
               'restrict': 'public'}
@@ -135,7 +135,7 @@ def favorites(userid):
     return res
 
 
-def next_url(url):
+def next_url(url): #用来处理nexturl
     hash = p_hash()
     headers = {'Authorization': 'Bearer ' + token['response']['access_token'],
                'User-Agent': 'PixivAndroidApp/5.0.191 (Android 6.0.1; HUAWEI ALE-CL00)',
@@ -156,14 +156,14 @@ def next_url(url):
 def database(setu):
     if mycol.count_documents({'artwork': setu.artwork}) == False:  # 通过ID去重
         lastdata = mycol.find().sort('_id', -1).limit(1)  # 数据库的最后一条数据
-        num = list(lastdata)[0]['_id'] + 1
+        num = list(lastdata)[0]['_id'] + 1  # +1(_)
         setudict = {'_id': num, 'title': setu.title, 'artwork': setu.artwork, 'author': setu.author,
                     'artist': setu.artist, 'R18': setu.R18, 'page': setu.page_count, 'tags': setu.tags,
                     'filename': setu.filename, 'original': setu.original, 'large': setu.large, 'medium': setu.medium,
-                    'square_medium': setu.square_medium}
-        info = mycol.insert_one(setudict)
-        print(info.inserted_id)
-        return info
+                    'square_medium': setu.square_medium} #拼凑字典..
+        info = mycol.insert_one(setudict) #向数据库插入数据
+        print(info.inserted_id) #打印_id
+        return info #没什么意义的return
     else:
         print('已存在')
         return
