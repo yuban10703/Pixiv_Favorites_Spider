@@ -7,11 +7,11 @@ import json
 import random
 from datetime import datetime
 
-username = '' #账号
-password = '' #密码
-myclient = pymongo.MongoClient("mongodb://10.1.1.142:27017/") #数据库地址
-mydb = myclient["setu"] #数据库
-mycol = mydb["setu_1"] #集合
+username = ''  # 账号
+password = ''  # 密码
+myclient = pymongo.MongoClient("mongodb://10.1.1.142:27017/")  # 数据库地址
+mydb = myclient["setu"]  # 数据库
+mycol = mydb["setu_1"]  # 集合
 
 hash_secret = '28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c'
 client_id = 'MOBrBDS8blbauoSck0ZfDbtuzpyT'
@@ -155,7 +155,8 @@ def next_url(url):
 
 def database(setu):
     if mycol.count_documents({'artwork': setu.artwork}) == False:  # 通过ID去重
-        num = mycol.count_documents({})  # 获取现在数据库有多少条数据,用来当作下一个_id,实现_id自动增长...
+        lastdata = mycol.find().sort('_id', -1).limit(1)  # 数据库的最后一条数据
+        num = list(lastdata)[0]['_id'] + 1
         setudict = {'_id': num, 'title': setu.title, 'artwork': setu.artwork, 'author': setu.author,
                     'artist': setu.artist, 'R18': setu.R18, 'page': setu.page_count, 'tags': setu.tags,
                     'filename': setu.filename, 'original': setu.original, 'large': setu.large, 'medium': setu.medium,
@@ -191,7 +192,7 @@ while True:
         print('>>OK<<')
         break
     a = next_url(a['next_url'])  # 翻页
-    time.sleep(random.randint(3,7))  # 休眠5s,不然会boom....
+    time.sleep(random.randint(3, 7))  # 休眠5s,不然会boom....
     for i in a['illusts']:  # 继续轮询
         y = database(Parsing(i))  # 将处理过的数据写入数据库
 
