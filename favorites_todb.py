@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 import hashlib
 import pymongo
@@ -11,7 +12,7 @@ username = ''  # 账号
 password = ''  # 密码
 myclient = pymongo.MongoClient("mongodb://10.1.1.142:27017/")  # 数据库地址
 mydb = myclient["setu"]  # 数据库
-mycol = mydb["setu_1"]  # 集合
+mycol = mydb["setu_2"]  # 集合
 
 hash_secret = '28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c'
 client_id = 'MOBrBDS8blbauoSck0ZfDbtuzpyT'
@@ -21,7 +22,7 @@ client_secret = 'lsACyCD94FhDUtGTXi3QzcFE2uU1hqtDaKeqrdwj'
 class Parsing:  # 处理信息
     def __init__(self, data):
         self.title = data['title']  # 标题
-        self.author = data['user']['name']  # 作者名
+        self.author = re.sub(r'[@,＠].*$', '', data['user']['name'])  # 作者名,去掉@后面的字符
         self.artist = data['user']['id']  # 作者ID
         self.artwork = data['id']  # 作品ID
         tags = []
@@ -63,7 +64,7 @@ def p_hash():
     return local_time, Hash
 
 
-def token(username, password): #登录
+def token(username, password):  # 登录
     url = 'https://oauth.secure.pixiv.net/auth/token'
     data = {'client_id': client_id,
             'client_secret': client_secret,
@@ -89,7 +90,7 @@ def token(username, password): #登录
     return res
 
 
-def refresh_token(): #刷新token
+def refresh_token():  # 刷新token
     url = 'https://oauth.secure.pixiv.net/auth/token'
     data = {'client_id': client_id,
             'client_secret': client_secret,
@@ -114,7 +115,7 @@ def refresh_token(): #刷新token
     return res
 
 
-def favorites(userid): #读取收藏夹
+def favorites(userid):  # 读取收藏夹
     url = 'https://app-api.pixiv.net/v1/user/bookmarks/illust'
     params = {'user_id': userid,
               'restrict': 'public'}
@@ -129,13 +130,12 @@ def favorites(userid): #读取收藏夹
                'X-Client-Time': hash[0],
                'X-Client-Hash': hash[1],
                'Host': 'app-api.pixiv.net',
-               'Connection': 'Keep-Alive',
                'Accept-Encoding': 'gzip'}
     res = requests.get(url, params=params, headers=headers)
     return res
 
 
-def next_url(url): #用来处理nexturl
+def next_url(url):  # 用来处理nexturl
     hash = p_hash()
     headers = {'Authorization': 'Bearer ' + token['response']['access_token'],
                'User-Agent': 'PixivAndroidApp/5.0.191 (Android 6.0.1; HUAWEI ALE-CL00)',
@@ -147,23 +147,25 @@ def next_url(url): #用来处理nexturl
                'X-Client-Time': hash[0],
                'X-Client-Hash': hash[1],
                'Host': 'app-api.pixiv.net',
-               'Connection': 'Keep-Alive',
                'Accept-Encoding': 'gzip'}
-    res = requests.get(url, headers=headers)
+    res = requests.get(url, headers=headers, timeout=5)
     return res.json()
 
 
 def database(setu):
     if mycol.count_documents({'artwork': setu.artwork}) == False:  # 通过ID去重
         lastdata = mycol.find().sort('_id', -1).limit(1)  # 数据库的最后一条数据
-        num = list(lastdata)[0]['_id'] + 1  # +1(_)
+        try:  # 数据库里没有数据会出错
+            num = list(lastdata)[0]['_id'] + 1  # +1(_)
+        except:  # 出错了就说明数据库没数据,那就从0开始
+            num = 0
         setudict = {'_id': num, 'title': setu.title, 'artwork': setu.artwork, 'author': setu.author,
                     'artist': setu.artist, 'R18': setu.R18, 'page': setu.page_count, 'tags': setu.tags,
                     'filename': setu.filename, 'original': setu.original, 'large': setu.large, 'medium': setu.medium,
-                    'square_medium': setu.square_medium} #拼凑字典..
-        info = mycol.insert_one(setudict) #向数据库插入数据
-        print(info.inserted_id) #打印_id
-        return info #没什么意义的return
+                    'square_medium': setu.square_medium}  # 拼凑字典..
+        info = mycol.insert_one(setudict)  # 向数据库插入数据
+        print(info.inserted_id)  # 打印_id
+        return info  # 没什么意义的return
     else:
         print('已存在')
         return
@@ -185,15 +187,18 @@ finally:
 
 a = favorites(token['response']['user']['id']).json()  # 第一次进入收藏夹
 
+data_num = len(list(mycol.find({})))
+
 for i in a['illusts']:  # 轮询收藏夹的画册
     x = database(Parsing(i))  # 将处理过的数据写入数据库
 while True:
     if a['next_url'] == None:  # 到最后一页就停止
-        print('>>OK<<')
+        print('>>done<<')
         break
     a = next_url(a['next_url'])  # 翻页
-    time.sleep(random.randint(3, 7))  # 休眠5s,不然会boom....
+    time.sleep(random.randint(4, 7))  # 休眠一下,不然会boom....
     for i in a['illusts']:  # 继续轮询
         y = database(Parsing(i))  # 将处理过的数据写入数据库
 
-print('done')
+nowdata_num = len(list(mycol.find({})))
+print('本次新增', nowdata_num - data_num, '条')
