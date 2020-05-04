@@ -3,12 +3,15 @@ import asyncio
 import aiofiles
 import os
 import pymongo
+import json
 
-path = 'Y:\\setu\\'  # 下载路径
-
-myclient = pymongo.MongoClient("mongodb://10.1.1.142:27017/")  # 数据库地址
-mydb = myclient["setu"]  # 数据库
-mycol = mydb["setu_1"]  # 集合
+with open('config.json', 'r', encoding='utf-8') as f:
+    config = json.loads(f.read())
+    print('获取配置成功')
+myclient = pymongo.MongoClient(config['mongodb'])  # 数据库地址
+mydb = myclient[config['database']]  # 数据库
+mycol = mydb[config['collection']]  # 集合
+path = config['download_path']  # 下载路径
 
 headers = {'User-Agent': 'PixivAndroidApp/5.0.191 (Android 6.0.1; HUAWEI ALE-CL00)',
            'Accept-Language': 'zh_CN',

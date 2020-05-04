@@ -8,11 +8,15 @@ import json
 import random
 from datetime import datetime
 
-username = ''  # 账号
-password = ''  # 密码
-myclient = pymongo.MongoClient("mongodb://10.1.1.142:27017/")  # 数据库地址
-mydb = myclient["setu"]  # 数据库
-mycol = mydb["setu_2"]  # 集合
+
+with open('config.json', 'r', encoding='utf-8') as f:
+    config = json.loads(f.read())
+    print('获取配置成功')
+myclient = pymongo.MongoClient(config['mongodb'])  # 数据库地址
+mydb = myclient[config['database']]  # 数据库
+mycol = mydb[config['collection']]  # 集合
+username = config['username']  # 账号
+password = config['password']  # 密码
 
 hash_secret = '28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c'
 client_id = 'MOBrBDS8blbauoSck0ZfDbtuzpyT'
