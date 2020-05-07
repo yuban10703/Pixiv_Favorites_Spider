@@ -1,11 +1,12 @@
+from PIL import Image
 import aiohttp
 import asyncio
-import aiofiles
+import io
 import os
 import pymongo
 import json
 
-with open('config.json', 'r', encoding='utf-8') as f:
+with open('config.json', 'r', encoding='utf-8') as f:  # 从json读配置
     config = json.loads(f.read())
     print('获取配置成功')
 myclient = pymongo.MongoClient(config['mongodb'])  # 数据库地址
@@ -19,22 +20,18 @@ headers = {'User-Agent': 'PixivAndroidApp/5.0.191 (Android 6.0.1; HUAWEI ALE-CL0
            'App-OS-Version': '6.0.1',
            'App-Version': '5.0.191',
            'Referer': 'https://www.pixiv.net'}
-# path = os.getcwd()
 
 list = os.listdir(path)  # 获取下载路径的所有文件
 print(list)  # 打印文件列表
 
 
 async def download(filename, url):  # 下载
-    # filename = os.path.basename(url)
     if filename not in list:  # 如果文件不在列表中就下载
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as resp:
                 print(resp.status)  # 打印状态码
-                test = await resp.content.read()
-                async with aiofiles.open(path + filename, 'wb') as f:
-                    await f.write(test)
-                    print(path + filename)  # 打印路径+文件名
+                date = await resp.content.read()
+                Image.open(io.BytesIO(date)).save(path + filename)  # 以二进制读取文件,并转码为对应格式保存
     else:
         print('已下载过')
 
@@ -52,4 +49,4 @@ async def main():
     await asyncio.gather(*tasks)  # 并发执行
 
 
-asyncio.run(main())
+asyncio.run(main())  # gogogo

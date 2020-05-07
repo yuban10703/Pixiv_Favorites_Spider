@@ -1,9 +1,9 @@
 {
   "username":"",
   "password":"",
+  "type": "public",
   "mongodb": "mongodb://10.1.1.142:27017/",
   "database": "setu",
-  "collection": "setu_2",
-  "download_path": "Y:\\setu\\",
-  "conversion_path":"Y:\\PICS\\"
+  "collection": "setu_all",
+  "download_path": "Y:\\PICS\\"
 }
