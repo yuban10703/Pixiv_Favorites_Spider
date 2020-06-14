@@ -16,6 +16,7 @@ with open('config.json', 'r', encoding='utf-8') as f:
 myclient = pymongo.MongoClient(config['mongodb'])
 mydb = myclient[config['database']]
 mycol = mydb[config['collection']]
+mycol_del = mydb[config['collection_del']]
 username = config['username']
 password = config['password']
 
@@ -36,8 +37,8 @@ class Processed_data:
             self.author = re.sub(r'[@,＠].*$', '', illust['user']['name'])  # 作者名,去掉@后面的字符
             self.artwork = illust['id']  # 作品ID
             self.artist = illust['user']['id']  # 作者ID
-            self.width = illust['width']  # 宽度
-            self.height = illust['height']  # 高度
+            # self.width = illust['width']  # 宽度
+            # self.height = illust['height']  # 高度
             self.tags = []
             for tag in illust['tags']:  # 轮询tags
                 self.tags.append(tag['name'])
@@ -68,6 +69,7 @@ class Processed_data:
                      'filename': self.filename, 'original': self.original, 'large': self.large, 'medium': self.medium,
                      'square_medium': self.square_medium}  # 拼凑字典..
         self.data_list.append(data_dict)
+
 
 class Token:  # 获取token
     def __init__(self, username, password):
@@ -142,13 +144,14 @@ class Favorites:
                         'Host': 'app-api.pixiv.net',
                         'Accept-Encoding': 'gzip'}
 
-    @retry(stop_max_attempt_number=3)  # 表示重试以下代码三次
+    @retry(stop_max_attempt_number=5, wait_random_max=2000)
     def favorites(self):
+        print("-" * 30)
         local_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S+08:00')
         Hash = hashlib.md5((local_time + hash_secret).encode('utf-8')).hexdigest()
         self.headers['X-Client-Time'] = local_time  # 更新
         self.headers['X-Client-Hash'] = Hash
-        res = requests.get(url=self.url, params=self.params, headers=self.headers, timeout=8)
+        res = requests.get(url=self.url, params=self.params, headers=self.headers)
         return res.json()
 
 
@@ -159,23 +162,25 @@ class Favorites_next_url(Favorites):
         self.params = {}
 
 
-def database(collection, data_list):
+def database(collection, collection_del, data_list):
     data_for_del = []  # 待删除的数据
     for data in data_list:  # 去重与更新
         filename = data['filename']
+        data_if_del = collection_del.find_one({'filename': filename})
+        if data_if_del != None:  # 如果数据被删除过
+            data_for_del.append(data)  # 添加到待删除列表
+            continue
         data_tmp = collection.find_one({'filename': filename})  # 查找是否有这条数据 (测试)
         if data_tmp != None:  # 表中有相同数据
             if data_tmp['original'] == data['original']:  # 如果数据表中数据和爬下来的一致
-                print('已存在')
+                print('数据一致')
+                data_for_del.append(data)  # 添加到待删除列表
             else:
-                print('不一致,尝试更新')
-                result = collection.update_one({'filename': filename},
-                                               {'$set': data})  # 更新数据(filename是唯一的,直接覆盖掉除_id外的数据)
-                if result.modified_count:
-                    print('更新成功')
-                else:
-                    print('更新失败?????????')
-            data_for_del.append(data)  # 添加到待删除列表
+                print('不一致,删除')
+                # result = collection.update_one({'filename': filename},
+                #                                {'$set': data})  # 更新数据(filename是唯一的,直接覆盖掉除_id外的数据)  # 作者如果删P了的话没法删掉之前多出来的P
+                result = collection.delete_many({'artwork': data['artwork']})  # 删除这个id的所有数据
+                print("已删除{}条数据".format(result.deleted_count))
     for data_del in data_for_del:
         data_list.remove(data_del)  # 从待插入数据中删除
     if len(data_list) > 0:  # 如果待插入列表还有数据

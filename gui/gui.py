@@ -11,6 +11,7 @@ path = config['path']
 myclient = pymongo.MongoClient(config['mongodb'])  # 数据库地址
 mydb = myclient[config['database']]  # 数据库
 setu_all = mydb[config['collection']]  # 集合
+setu_del = mydb[config['collection_del']]  # 集合
 
 
 class App:
@@ -233,7 +234,8 @@ class App:
     def del_data(self, event=None):
         if tkinter.messagebox.askokcancel('删除', '红豆泥??'):
             res = setu_all.delete_one({'_id': self.data['_id']})
-            print('删除数量:{}'.format(res.deleted_count))
+            res_del = setu_del.insert_one({'filename':self.data['filename']})
+            print('删除数量:{}  {}'.format(res.deleted_count,res_del.inserted_id))
         return
 
     def refresh(self):

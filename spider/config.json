@@ -3,5 +3,6 @@
   "password":"",
   "mongodb": "10.1.1.142:27017/setu",
   "database": "setu",
-  "collection": "setu_test_all"
+  "collection": "setu_test_all",
+  "collection_del": "setu_del"
 }
