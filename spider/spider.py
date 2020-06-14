@@ -216,7 +216,7 @@ if __name__ == '__main__':
     '''开始'''
     data = Favorites(token_data).favorites()  # 第一次进入收藏夹
     data_list = Processed_data(data).data_list  # 处理数据
-    database(mycol, data_list)  # 插入数据库
+    database(mycol, mycol_del, data_list)  # 插入数据库
     while True:
         if data['next_url'] == None:  # 到最后一页就停止
             print('>>done<<')
@@ -225,7 +225,7 @@ if __name__ == '__main__':
         time.sleep(random.randint(4, 6))
         data = Favorites_next_url(token_data, nexturl).favorites()
         data_list = Processed_data(data).data_list
-        database(mycol, data_list)
+        database(mycol, mycol_del, data_list)
     '''结束'''
     nowdata_num = len(list(mycol.find({})))
     print('本次新增', nowdata_num - data_num, '条')
