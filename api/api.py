@@ -1,19 +1,20 @@
-from fastapi import FastAPI, Query
-from fastapi.responses import JSONResponse
 import re
 import motor.motor_asyncio
+from fastapi import FastAPI, Query
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 client = motor.motor_asyncio.AsyncIOMotorClient
 
-myclient = client("mongodb://10.1.1.142:27017/setu")
+myclient = client("mongodb://sepi:laosepi10703@10.1.1.142:27017/setu")
 
 mydb = myclient["setu"]
+collection = 'setu_all_v3'
 
 
 async def find(condition, num):  # collection为str参数
     result = await mydb.command(
-        'aggregate', 'setu_all_v3',
+        'aggregate', collection,
         pipeline=[{'$match': condition},
                   {'$sample': {'size': num}}],
         explain=False)
@@ -70,21 +71,20 @@ async def setu_v2(tag: str = Query('', max_length=45), num: int = Query(1, ge=1,
         return JSONResponse(status_code=500, content={'code': 500, 'msg': '爆炸啦~', 'error': str(error)})
 
 
-ways_v3 = {'normal': 'normal', 'sexy': 'sexy', 'porn': 'porn'}
+ways_v3 = {0: 'normal', 1: 'sexy', 2: 'porn'}
 
 
 @app.get("/setu_v3")
 async def setu_v3(tag: str = Query('', max_length=45), num: int = Query(1, ge=1, le=10),
-                  type: str = Query('', max_length=15)):
+                  type: int = Query(0, ge=0, le=3)):
     print('{0}SETU_V3: tag:[{1}] type:[{2}] num:[{3}]{4}'.format('>' * 20, tag, type, num, '<' * 20))
     try:
         data_re = re.compile(tag)
-        if type == '' or type.isspace():
+        if type == 3:
             condition = {'tags': data_re}
-            data = await find(condition, num)
         else:
             condition = {'tags': data_re, 'type': ways_v3[type]}
-            data = await find(condition, num)
+        data = await find(condition, num)
         setu = list(data)
         setus_num = len(setu)
         if setus_num != 0:

@@ -103,13 +103,19 @@ if __name__ == '__main__':
     # allsetus = setu_all.find({'_id':3368}).sort('_id',-1)
     print('从{}开始'.format(_id))
     for setu in allsetus:
-        # if len(repeat) > 5:
-        #     break
-        print(setu['_id'])
+        if repeat > 5:
+            break
+        print('id:{}:{}'.format(setu['_id'],setu['title'])  ,end='')
         filename = setu['filename']
         tag_for_tx = Identification(filename)
         tag = ways[tag_for_tx.result()]
-        print(tag)
-        result = setu_all.update_one({'filename': filename},
-                                     {'$set': {'type': tag}})  # 更新数据
+        print(', {}'.format(tag))
+        tag_before = setu['type']
+        # print(tag_before)
+        if tag_before == None:
+            result = setu_all.update_one({'filename': filename},
+                                         {'$set': {'type': tag}})  # 更新数据
+            print('更新数量:{}'.format(result.matched_count))
+            continue
+        repeat += 1
         time.sleep(0.5)

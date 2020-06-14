@@ -161,6 +161,7 @@ class App:
         if len(id) == 0 or id.isspace() or (not id.isdigit()):
             tkinter.messagebox.showwarning('???', '什么意思?')  # 弹窗警告
             return
+        self.num = int(id)
         self.data = setu_all.find_one({'_id': int(id)})
         self.pic = path + self.data['filename']
         self.refresh()
