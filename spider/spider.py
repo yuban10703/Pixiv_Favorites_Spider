@@ -10,7 +10,7 @@ from retrying import retry
 from datetime import datetime
 
 '''获取配置'''
-with open('config.json', 'r', encoding='utf-8') as f:
+with open('/home/ubuntu/download_setu/config.json', 'r', encoding='utf-8') as f:
     config = json.loads(f.read())
     print('获取配置成功')
 myclient = pymongo.MongoClient(config['mongodb'])
@@ -167,7 +167,9 @@ def database(collection, collection_del, data_list):
     for data in data_list:  # 去重与更新
         filename = data['filename']
         data_if_del = collection_del.find_one({'filename': filename})
+ #       print(data_if_del)
         if data_if_del != None:  # 如果数据被删除过
+            print('数据被删除过')
             data_for_del.append(data)  # 添加到待删除列表
             continue
         data_tmp = collection.find_one({'filename': filename})  # 查找是否有这条数据 (测试)
@@ -225,7 +227,7 @@ if __name__ == '__main__':
         time.sleep(random.randint(4, 6))
         data = Favorites_next_url(token_data, nexturl).favorites()
         data_list = Processed_data(data).data_list
-        database(mycol, mycol_del, data_list)
+        database(mycol,mycol_del, data_list)
     '''结束'''
     nowdata_num = len(list(mycol.find({})))
     print('本次新增', nowdata_num - data_num, '条')

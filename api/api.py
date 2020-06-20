@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 app = FastAPI()
 client = motor.motor_asyncio.AsyncIOMotorClient
 
-myclient = client("mongodb://sepi:laosepi10703@10.1.1.142:27017/setu")
+myclient = client("mongodb://10.1.1.142:27017/setu")
 
 mydb = myclient["setu"]
 collection = 'setu_all_v3'
@@ -29,11 +29,10 @@ async def setu_v1(tag: str = Query('', max_length=35), r18: bool = False):
         condition = {'tags': data_re}
         if r18:
             condition['type'] = 'sexy'
-            data = await find(condition, 1)
+            setu = await find(condition, 1)
         else:
             condition['type'] = 'porn'
-            data = await find(condition, 1)
-        setu = list(data)
+            setu = await find(condition, 1)
         setus_num = len(setu)
         if setus_num != 0:
             setu_full = setu[0]
@@ -53,11 +52,10 @@ async def setu_v2(tag: str = Query('', max_length=45), num: int = Query(1, ge=1,
         condition = {'tags': data_re}
         if r18:
             condition['type'] = 'porn'
-            data = await find(condition, num)
+            setu = await find(condition, num)
         else:
             condition['type'] = 'sexy'
-            data = await find(condition, num)
-        setu = list(data)
+            setu = await find(condition, num)
         setus_num = len(setu)
         if setus_num != 0:
             for i in range(setus_num):  # 兼容v2
@@ -84,11 +82,10 @@ async def setu_v3(tag: str = Query('', max_length=45), num: int = Query(1, ge=1,
             condition = {'tags': data_re}
         else:
             condition = {'tags': data_re, 'type': ways_v3[type]}
-        data = await find(condition, num)
-        setu = list(data)
+        setu = await find(condition, num)
         setus_num = len(setu)
         if setus_num != 0:
-            setu_full = {'code': 200}
+            setu_full = {'code': 200,'count': setus_num}
             setu_full['data'] = setu
             return setu_full
         else:

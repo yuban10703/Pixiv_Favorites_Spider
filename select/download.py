@@ -30,35 +30,40 @@ list = os.listdir(path)  # 获取下载路径的所有文件
 list_original = os.listdir(path_original)
 
 
-async def download(session,filename, url, path):  # 下载
+
+async def download(session, filename, url, path):  # 下载
     try:
         async with session.get(url, headers=headers) as resp:
-            print(resp.status)  # 打印状态码
+            assert resp.status == 200
             date = await resp.content.read()
             Image.open(io.BytesIO(date)).save(path + filename)  # 以二进制读取文件,并转码为对应格式保存
-            return
     except:
-        print('>>>', filename, '<<')
+        faild_list.append(url)
+    finally:
+        print('>>>{}<<< :{}'.format(filename, resp.status))
         return
 
-async def download_original(session,filename, url, path):  # 下载
+
+
+async def download_original(session, filename, url, path):  # 下载
     try:
         async with session.get(url, headers=headers) as resp:
-            print(resp.status)  # 打印状态码
+            assert resp.status == 200  # 状态码为200才保存
             date = await resp.content.read()
             async with aiofiles.open(path + filename, 'wb') as f:
                 await f.write(date)
-            return
     except:
-        print('>>>', filename, '<<')
-        faild_list.append(filename)
+        faild_list.append(url)
+    finally:
+        print('>>>{}<<< :{}'.format(filename, resp.status))
         return
-
 
 
 alldata = mycol.find({})  # 读取数据库所有信息
 tasks = []  # 任务列表
 faild_list = []
+
+
 async def main():
     # num = 0
     async with aiohttp.ClientSession() as session:
@@ -69,9 +74,10 @@ async def main():
             url_original = data['original']
             filename = data['filename']  # 获取文件名
             if filename not in list:
-                tasks.append(asyncio.create_task(download(session,filename, url, path)))  # 加入任务
+                tasks.append(asyncio.create_task(download(session, filename, url, path)))  # 加入任务
             if filename not in list_original:
-                tasks.append(asyncio.create_task(download_original(session,filename, url_original, path_original)))  # 加入任务(原图)
+                tasks.append(
+                    asyncio.create_task(download_original(session, filename, url_original, path_original)))  # 加入任务(原图)
                 # num +=1
         await asyncio.gather(*tasks)  # 并发执行
 

@@ -18,7 +18,7 @@ class App:
     def __init__(self, master):
         self.window = master
         '''定义窗口'''
-        self.window.title("手动筛色图 Ver2.0")
+        self.window.title("手动筛色图 Ver2.1")
         # self.window.geometry("800x550")
         width = 800
         height = 550
@@ -79,7 +79,7 @@ class App:
         # self.window.inputlable.pack()
         '''类型显示'''
         self.type_text = StringVar()
-        self.window.pic_type = Label(display_filename,textvariable=self.type_text,font=(None, 25))
+        self.window.pic_type = Label(display_filename, textvariable=self.type_text, font=(None, 25))
         self.window.pic_type.pack()
         '''tag列表'''
         self.window.del_tag = Button(taglist, text="删除tag", fg='red',
@@ -124,7 +124,10 @@ class App:
         self.window.inputentry.bind("<Return>", self.handlerAdaptor(self.add_tag))  # 在输入框里按下回车增加tag
         self.window.jump_inputentry.bind("<Return>", self.handlerAdaptor(self.dump))  # 在输入框里按下回车增加tag
         self.window.jump_inputentry_id.bind("<Return>", self.handlerAdaptor(self.dump_id))  # 在输入框里按下回车增加tag
-        self.window.taglist.bind("<Double-Button-1>", self.handlerAdaptor(self.del_tag))  # 在输入框里按下del删除tag
+        self.window.taglist.bind("<Double-Button-1>", self.handlerAdaptor(self.del_tag))  # 双击tag删除
+        self.window.bind("<z>", self.handlerAdaptor(self.change_tag, want_type='normal'))  # z
+        self.window.bind("<x>", self.handlerAdaptor(self.change_tag, want_type='sexy'))  # z
+        self.window.bind("<c>", self.handlerAdaptor(self.change_tag, want_type='porn'))  # z
         # self.window.bind("<Key>", self.handlerAdaptor)
         # self.window.bind("<Key>", self.handlerAdaptor)
 
@@ -227,15 +230,18 @@ class App:
     def change_tag(self, event=None, want_type=''):
         # print(self.data)
         if tkinter.messagebox.askokcancel(want_type, '红豆泥?'):
-            res = setu_all.update_one({'_id': self.data['_id']},
+            res = setu_all.update_one({'_id': self.data['_id']},  # 更新数据库信息
                                       {'$set': {'type': want_type}})
+            self.data['type'] = want_type  # 改变本地变量
+            self.refresh()
             print('更新数量:{}'.format(res.matched_count))
 
     def del_data(self, event=None):
         if tkinter.messagebox.askokcancel('删除', '红豆泥??'):
-            res = setu_all.delete_one({'_id': self.data['_id']})
-            res_del = setu_del.insert_one({'filename':self.data['filename']})
-            print('删除数量:{}  {}'.format(res.deleted_count,res_del.inserted_id))
+            res = setu_all.delete_one({'_id': self.data['_id']})  # 从数据库删除
+            res_del = setu_del.insert_one(
+                {'filename': self.data['filename'], 'artwork': self.data['artwork']})  # 记录文件名,下次爬取不再存入
+            print('删除数量:{}  {}'.format(res.deleted_count, res_del.inserted_id))
         return
 
     def refresh(self):
