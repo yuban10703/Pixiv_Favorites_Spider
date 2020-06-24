@@ -33,29 +33,38 @@ list_original = os.listdir(path_original)
 
 async def download(session, filename, url, path):  # 下载
     try:
-        async with session.get(url, headers=headers) as resp:
-            assert resp.status == 200
-            date = await resp.content.read()
-            Image.open(io.BytesIO(date)).save(path + filename)  # 以二进制读取文件,并转码为对应格式保存
-    except:
+        async with session.get(url, headers=headers) as res:
+            if res.status == 200:
+                date = await res.content.read()
+                Image.open(io.BytesIO(date)).save(path + filename)  # 以二进制读取文件,并转码为对应格式保存
+                print('{}下载成功  '.format(filename, res.status))
+                return
+            else:
+                faild_list.append(url)
+                print('下载失败: >>>{}<<< {}'.format(filename, res.status))
+                return
+    except:  # 不知道为什么会出错.....
         faild_list.append(url)
-    finally:
-        print('>>>{}<<< :{}'.format(filename, resp.status))
+        print('下载失败: >>>{}<<<'.format(filename))
         return
-
 
 
 async def download_original(session, filename, url, path):  # 下载
     try:
-        async with session.get(url, headers=headers) as resp:
-            assert resp.status == 200  # 状态码为200才保存
-            date = await resp.content.read()
-            async with aiofiles.open(path + filename, 'wb') as f:
-                await f.write(date)
+        async with session.get(url, headers=headers) as res:
+            if res.status == 200:  # 状态码为200才保存
+                date = await res.content.read()
+                async with aiofiles.open(path + filename, 'wb') as f:
+                    await f.write(date)
+                print('{}下载成功  '.format(filename, res.status))
+                return
+            else:
+                faild_list.append(url)
+                print('下载失败: >>>{}<<< {}'.format(filename, res.status))
+                return
     except:
         faild_list.append(url)
-    finally:
-        print('>>>{}<<< :{}'.format(filename, resp.status))
+        print('下载失败: >>>{}<<<'.format(filename))
         return
 
 
