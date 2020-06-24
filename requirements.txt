@@ -2,6 +2,7 @@ asyncio
 pymongo
 requests
 aiohttp
+aiofiles
 Pillow
 FastAPI
 py-cpuinfo
