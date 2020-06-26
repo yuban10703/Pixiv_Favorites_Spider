@@ -24,12 +24,12 @@ async def find(condition, num):  # collection为str参数
 # ------------------------------------------------------------------------------------------------------------
 
 @app.get("/setu")
-async def setu_v1(tag: str = Query(None, max_length=35), r18: bool = False):
+async def setu_v1(tag: str = Query('', max_length=35), r18: bool = False):
     print('{0}SETU_V1: tag:[{1}] r18:[{2}]{3}'.format('>' * 20, tag, r18, '<' * 20))
     condition = {}
     try:
-        if tag != None:
-            data_re = re.compile(tag)
+        if (len(tag) != 0) and (not tag.isspace()):  # 如果tag不为空(字符串字数不为零且不为空)
+            data_re = re.compile(tag.strip())  # 去除字符串两边空格
             condition['tags'] = data_re
         if r18:
             condition['type'] = 'porn'
@@ -52,12 +52,12 @@ async def setu_v1(tag: str = Query(None, max_length=35), r18: bool = False):
 
 
 @app.get("/setu_v2")
-async def setu_v2(tag: str = Query(None, max_length=45), num: int = Query(1, ge=1, le=10), r18: bool = False):
+async def setu_v2(tag: str = Query('', max_length=45), num: int = Query(1, ge=1, le=10), r18: bool = False):
     print('{0}SETU_V2: tag:[{1}] r18:[{2}] num:[{3}]{4}'.format('>' * 20, tag, r18, num, '<' * 20))
     condition = {}
     try:
-        if tag != None:
-            data_re = re.compile(tag)
+        if (len(tag) != 0) and (not tag.isspace()):  # 如果tag不为空(字符串字数不为零且不为空)
+            data_re = re.compile(tag.strip())
             condition['tags'] = data_re
         if r18:
             condition['type'] = 'porn'
@@ -85,15 +85,15 @@ ways_v3 = {0: 'normal', 1: 'sexy', 2: 'porn', 3: alltag}
 
 
 @app.get("/setu_v3")
-async def setu_v3(tag: str = Query(None, max_length=45), num: int = Query(1, ge=1, le=10),
+async def setu_v3(tag: str = Query('', max_length=45), num: int = Query(1, ge=1, le=10),
                   type: int = Query(0, ge=0, le=3)):
     print('{0}SETU_V3: tag:[{1}] type:[{2}] num:[{3}]{4}'.format('>' * 20, tag, type, num, '<' * 20))
     try:
-        if tag != None:  # 如果定义了tag
-            data_re = re.compile(tag)  # 正则
-            condition = {'tags': data_re, 'type': ways_v3[type]}
-        else:  # 没定义tag
+        if len(tag) == 0 or tag.isspace():  # 如果tag为空(字符串字数为0或者为空格)
             condition = {'type': ways_v3[type]}
+        else:
+            data_re = re.compile(tag.strip())  # 正则
+            condition = {'tags': data_re, 'type': ways_v3[type]}
         setu = await find(condition, num)
         setus_num = len(setu)
         if setus_num != 0:
