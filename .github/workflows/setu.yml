@@ -1,11 +1,11 @@
 name: 'setu'
 
 on:
-  schedule:
-    - cron: '0 20 * * *'
+#   schedule:
+#     - cron: '0 20 * * *'
 #     - cron: '*/30 * * * *'
-  watch:
-     types: started
+#   watch:
+#      types: started
 
 jobs:
   pixiv-favorites-spider:
