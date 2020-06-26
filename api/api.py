@@ -21,6 +21,8 @@ async def find(condition, num):  # collection为str参数
     return result['cursor']['firstBatch']
 
 
+# ------------------------------------------------------------------------------------------------------------
+
 @app.get("/setu")
 async def setu_v1(tag: str = Query('', max_length=35), r18: bool = False):
     print('{0}SETU_V1: tag:[{1}] r18:[{2}]{3}'.format('>' * 20, tag, r18, '<' * 20))
@@ -42,6 +44,9 @@ async def setu_v1(tag: str = Query('', max_length=35), r18: bool = False):
             return JSONResponse(status_code=404, content={'code': 404, 'msg': '色图库中没找到色图~'})
     except Exception as error:
         return JSONResponse(status_code=500, content={'code': 500, 'msg': '爆炸啦~', 'error': str(error)})
+
+
+# ------------------------------------------------------------------------------------------------------------
 
 
 @app.get("/setu_v2")
@@ -69,26 +74,30 @@ async def setu_v2(tag: str = Query('', max_length=45), num: int = Query(1, ge=1,
         return JSONResponse(status_code=500, content={'code': 500, 'msg': '爆炸啦~', 'error': str(error)})
 
 
-ways_v3 = {0: 'normal', 1: 'sexy', 2: 'porn'}
+# ------------------------------------------------------------------------------------------------------------
+
+alltag = re.compile('.')
+ways_v3 = {0: 'normal', 1: 'sexy', 2: 'porn', 3: alltag}
 
 
 @app.get("/setu_v3")
-async def setu_v3(tag: str = Query('', max_length=45), num: int = Query(1, ge=1, le=10),
+async def setu_v3(tag: str = Query(None, max_length=45), num: int = Query(1, ge=1, le=10),
                   type: int = Query(0, ge=0, le=3)):
     print('{0}SETU_V3: tag:[{1}] type:[{2}] num:[{3}]{4}'.format('>' * 20, tag, type, num, '<' * 20))
     try:
-        data_re = re.compile(tag)
-        if type == 3:
-            condition = {'tags': data_re}
-        else:
+        if tag != None:  # 如果定义了tag
+            data_re = re.compile(tag)  # 正则
             condition = {'tags': data_re, 'type': ways_v3[type]}
+        else:  # 没定义tag
+            condition = {'type': ways_v3[type]}
         setu = await find(condition, num)
         setus_num = len(setu)
         if setus_num != 0:
-            setu_full = {'code': 200,'count': setus_num}
+            setu_full = {'code': 200, 'count': setus_num}
             setu_full['data'] = setu
             return setu_full
         else:
-            return JSONResponse(status_code=404, content={'code': 404, 'msg': '色图库中没找到色图~'})
+            return JSONResponse(status_code=404, content={'code': 404, 'count': 0, 'msg': '色图库中没找到色图~'})
     except Exception as error:
-        return JSONResponse(status_code=500, content={'code': 500, 'msg': '爆炸啦~', 'error': str(error)})
+        return JSONResponse(status_code=500,
+                            content={'code': 500, 'count': 0, 'msg': '爆炸啦~', 'error': str(error)})
