@@ -1,0 +1,46 @@
+name: 'setu'
+
+on:
+  schedule:
+    - cron: '0 20 * * *'
+#     - cron: '*/30 * * * *'
+  watch:
+     types: started
+
+jobs:
+  pixiv-favorites-spider:
+    runs-on: ubuntu-latest
+    steps:
+#      - name: Initialization environment
+#        env:
+#          DEBIAN_FRONTEND: noninteractive
+#        run: |
+#          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+#          sudo -E apt-get -qq update
+#          sudo -E apt-get -qq autoremove --purge
+#          sudo -E apt-get -qq clean
+#          sudo timedatectl set-timezone "Asia/Shanghai"
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: 'Set up Python'
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: 'Install dependencies'
+        run: python -m pip install --upgrade pip
+      - name: 'Install requirements'
+        run: pip install -r ./requirements.txt
+
+      - name: 'downloading setus'
+        timeout-minutes: 360
+        run: python download.py ${{ secrets.mongodb }} ${{ secrets.username }} ${{ secrets.password }}
+#      - name: 'Commit setus'
+#        run: |
+#          git config --local user.email "action@github.com"
+#          git config --local user.name "GitHub Action"
+#          git add -A
+#          git commit -m "add pics" -a
+#      - name: 'Push setus'
+#        uses: ad-m/github-push-action@master
+#        with:
+#          github_token: ${{ secrets.TOKEN }}
