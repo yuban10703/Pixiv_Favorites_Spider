@@ -24,16 +24,18 @@ async def find(condition, num):  # collection为str参数
 # ------------------------------------------------------------------------------------------------------------
 
 @app.get("/setu")
-async def setu_v1(tag: str = Query('', max_length=35), r18: bool = False):
+async def setu_v1(tag: str = Query(None, max_length=35), r18: bool = False):
     print('{0}SETU_V1: tag:[{1}] r18:[{2}]{3}'.format('>' * 20, tag, r18, '<' * 20))
+    condition = {}
     try:
-        data_re = re.compile(tag)
-        condition = {'tags': data_re}
+        if tag != None:
+            data_re = re.compile(tag)
+            condition['tags'] = data_re
         if r18:
-            condition['type'] = 'sexy'
+            condition['type'] = 'porn'
             setu = await find(condition, 1)
         else:
-            condition['type'] = 'porn'
+            condition['type'] = 'sexy'
             setu = await find(condition, 1)
         setus_num = len(setu)
         if setus_num != 0:
@@ -50,11 +52,13 @@ async def setu_v1(tag: str = Query('', max_length=35), r18: bool = False):
 
 
 @app.get("/setu_v2")
-async def setu_v2(tag: str = Query('', max_length=45), num: int = Query(1, ge=1, le=10), r18: bool = False):
+async def setu_v2(tag: str = Query(None, max_length=45), num: int = Query(1, ge=1, le=10), r18: bool = False):
     print('{0}SETU_V2: tag:[{1}] r18:[{2}] num:[{3}]{4}'.format('>' * 20, tag, r18, num, '<' * 20))
+    condition = {}
     try:
-        data_re = re.compile(tag)
-        condition = {'tags': data_re}
+        if tag != None:
+            data_re = re.compile(tag)
+            condition['tags'] = data_re
         if r18:
             condition['type'] = 'porn'
             setu = await find(condition, num)
