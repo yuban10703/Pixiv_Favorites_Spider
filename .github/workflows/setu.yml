@@ -1,11 +1,11 @@
 name: 'setu'
 
 on:
-  schedule:
-    - cron: '0 20 * * *'
+#   schedule:
+#     - cron: '0 20 * * *'
 #     - cron: '*/30 * * * *'
-  watch:
-     types: started
+#   watch:
+#      types: started
 
 jobs:
   pixiv-favorites-spider:
@@ -29,7 +29,7 @@ jobs:
       - name: 'Install dependencies'
         run: python -m pip install --upgrade pip
       - name: 'Install requirements'
-        run: pip install -r ./requirements.txt
+        run: pip install -r ./spider/actions/requirements.txt
 
       - name: 'downloading setus'
         timeout-minutes: 360
