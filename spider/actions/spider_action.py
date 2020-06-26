@@ -12,8 +12,8 @@ from datetime import datetime
 
 myclient = pymongo.MongoClient(sys.argv[1])
 mydb = myclient['setu']
-mycol = mydb['setu_all']
-mycol_del = mydb['setu_del']
+mycol = mydb['setu_all_test']
+mycol_del = mydb['setu_del_test']
 username = str(sys.argv[2])
 password = str(sys.argv[3])
 
