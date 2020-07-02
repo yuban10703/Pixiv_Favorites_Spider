@@ -91,7 +91,7 @@ async def setu_v3(tag: str = Query('', max_length=45), num: int = Query(1, ge=1,
                   type: int = Query(0, ge=0, le=3)):
     print('{0}SETU_V3: tag:[{1}] type:[{2}] num:[{3}]{4}'.format('>' * 20, tag, type, num, '<' * 20))
     try:
-        condition = ways_v3[type]
+        condition = ways_v3[type].copy()
         if (len(tag) != 0) and (not tag.isspace()):  # 如果tag不为空(字符串字数不为零且不为空)
             condition['tags'] = re.compile(tag.strip())
         setu = await find(condition, num)
