@@ -29,7 +29,7 @@ async def setu_v1(tag: str = Query('', max_length=35), r18: bool = False):
     condition = {}
     try:
         if (len(tag) != 0) and (not tag.isspace()):  # 如果tag不为空(字符串字数不为零且不为空)
-            condition['tags'] = re.compile(tag.strip())  # 正则并去掉字符两边空格
+            condition['tags'] = re.compile(tag.strip(), re.I)  # 正则并去掉字符两边空格
         if r18:
             condition['type'] = 'porn'
             setu = await find(condition, 1)
@@ -56,7 +56,7 @@ async def setu_v2(tag: str = Query('', max_length=45), num: int = Query(1, ge=1,
     condition = {}
     try:
         if (len(tag) != 0) and (not tag.isspace()):  # 如果tag不为空(字符串字数不为零且不为空)
-            condition['tags'] = re.compile(tag.strip())
+            condition['tags'] = re.compile(tag.strip(), re.I)
         if r18:
             condition['type'] = 'porn'
             setu = await find(condition, num)
@@ -93,7 +93,7 @@ async def setu_v3(tag: str = Query('', max_length=45), num: int = Query(1, ge=1,
     try:
         condition = ways_v3[type].copy()
         if (len(tag) != 0) and (not tag.isspace()):  # 如果tag不为空(字符串字数不为零且不为空)
-            condition['tags'] = re.compile(tag.strip())
+            condition['tags'] = re.compile(tag.strip(), re.I)
         setu = await find(condition, num)
         setus_num = len(setu)
         if setus_num != 0:
