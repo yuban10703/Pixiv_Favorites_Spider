@@ -1,0 +1,6 @@
+{
+  "mongodb": "mongodb://username:password@10.1.1.168:27017/setu",
+  "database": "setu",
+  "collection": "setu_test",
+  "collection_del": "setu_del_test"
+}
